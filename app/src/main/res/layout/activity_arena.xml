@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ArenaActivity"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:background="@color/colorPrimary">
+
+        <LinearLayout
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="bottom"
+            android:layout_marginHorizontal="10dp">
+
+            <ImageView
+                android:id="@+id/iv_imagen_jugador"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <TextView
+                android:id="@+id/tv_nombre_jugador"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:layout_marginVertical="10dp"/>
+
+            <ProgressBar
+                android:id="@+id/pb_vida_jugador"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:progressBackgroundTint="#014259"
+                android:progressTint="#1DE9B6"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="50dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="top"
+            android:layout_marginHorizontal="10dp">
+            
+            <ImageView
+                android:id="@+id/iv_imagen_oponente"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"/>
+
+            <TextView
+                android:id="@+id/tv_nombre_oponente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="20sp"
+                android:layout_marginVertical="10dp" />
+
+            <ProgressBar
+                android:id="@+id/pb_vida_oponente"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:progressBackgroundTint="#014259"
+                android:progressTint="#1DE9B6"
+                android:layout_gravity="center_horizontal"/>
+
+            //TODO:Agregar un boton para iniciar la batalla
+            <Button
+                android:id="@+id/btn_iniciaBatalla"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginTop="100dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/colorPrimaryDark"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>
