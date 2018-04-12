@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,6 +39,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     Localizacion local;
     Marker marcador;
     boolean marcadorlisto = false;
+    Button entrar;
     public static final int VERPERFIL = Menu.FIRST;
 
     @Override
@@ -54,7 +56,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         local = new Localizacion();
 
         mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ((LocationListener)local));
-
+        entrar = findViewById(R.id.entrar);
+        entrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intento = new Intent(MapsActivity.this, ArenaActivity.class);
+                intento.putExtra("id_animal", 1);
+                startActivity(intento);
+            }
+        });
     }
 
 

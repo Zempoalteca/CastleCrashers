@@ -34,7 +34,7 @@ public class ArenaActivity extends Activity {
         setContentView(R.layout.activity_arena);
 
         //Se recibe el id del oponente a enfrentar (enviado por el intento)
-        //int id_animal = getIntent().getIntExtra("id_animal",0);
+        int id_animal = getIntent().getIntExtra("id_animal",0);
         //Toast.makeText(this, "Valor entero recibido: "+id_animal, Toast.LENGTH_SHORT).show();
 
         //Se asocia los elementos visuales on la lógica
@@ -54,7 +54,7 @@ public class ArenaActivity extends Activity {
         jugador = db.getJugador();
 
         //Se obtiene la información del Animal a enfrentar
-        oponente = db.getAnimalById(10);
+        oponente = db.getAnimalById(id_animal);
 
         //Se añade la información del Jugador a la Arena
         imagenJugador.setImageResource(jugador.getImagen());
