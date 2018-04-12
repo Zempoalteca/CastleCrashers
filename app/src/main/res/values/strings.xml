@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">CastleCrashers</string>
     <string name="title_activity_maps">Map</string>
+    <string name="nivel">Nivel 1</string>
+    <string name="perdidas">Perdidas</string>
+    <string name="ganadas">Ganadas</string>
 </resources>
