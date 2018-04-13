@@ -2,6 +2,7 @@ package com.example.zaira.castlecrashers;
 
 import android.Manifest;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
@@ -9,14 +10,11 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -30,41 +28,39 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener  {
 
     private GoogleMap mMap;
     Localizacion local;
     Marker marcador;
-    boolean marcadorlisto = false;
-    Button entrar;
+    DBHelper db;
+    int cont =0;
+
+    ArrayList<Animal> animales= new ArrayList<>();
     public static final int VERPERFIL = Menu.FIRST;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        db = new DBHelper(this);
+        animales = db.getAllAnimales();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-             Manifest.permission.ACCESS_FINE_LOCATION},43);
+                Manifest.permission.ACCESS_FINE_LOCATION},43);
         final LocationManager mLocManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         local = new Localizacion();
 
         mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ((LocationListener)local));
-        entrar = findViewById(R.id.entrar);
-        entrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intento = new Intent(MapsActivity.this, ArenaActivity.class);
-                intento.putExtra("id_animal", 1);
-                startActivity(intento);
-            }
-        });
+
     }
 
 
@@ -78,16 +74,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady  (GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setZoomGesturesEnabled(false);
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        marcador=
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        LatLng sydney = new LatLng(19.4083302, -99.1729543);
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.caballero_mapa);
+        Bitmap b = bitmapDrawable.getBitmap();
+        Bitmap smallMarker = Bitmap.createScaledBitmap(b, 150, 150, false);
+
+        marcador = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        marcador.setIcon(BitmapDescriptorFactory.fromBitmap(smallMarker));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
+        for (Animal Animal:animales){
+
+            LatLng ubicacion = new LatLng(Animal.getLatitud(), Animal.getLongitud());
+            BitmapDrawable bitmapDrawable1 = (BitmapDrawable) getResources().getDrawable(Animal.getImagen());
+            Bitmap b1 = bitmapDrawable1.getBitmap();
+            Bitmap smallMarker1 = Bitmap.createScaledBitmap(b1, 150, 150, false);
+            Marker marcador1 = mMap.addMarker(new MarkerOptions().position(ubicacion));
+            marcador1.setIcon(BitmapDescriptorFactory.fromBitmap(smallMarker1));
+            int id = Animal.getId_animal();
+            marcador1.setTag(Animal.getId_animal());
+            mMap.setOnMarkerClickListener(this);
+
+        }
+
+
+
     }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Integer clickCount = (Integer) marker.getTag();
+        Intent intento = new Intent(MapsActivity.this, ArenaActivity.class);
+        intento.putExtra("id_animal", clickCount);
+        startActivity(intento);
+        return false;
+    }
+
 
     public  class Localizacion implements LocationListener {
         @Override
@@ -96,24 +122,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     "Latitud: " + location.getLatitude()
                     + "\nLongitud: " + location.getLongitude();
             //  mensaje2.setText(text);
-           //
+            //
             LatLng ubicacion = new LatLng(location.getLatitude(), location.getLongitude());
             setLocation(location);
 
-            if (!marcadorlisto){
-                BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.caballero_mapa);
-                Bitmap b = bitmapDrawable.getBitmap();
-                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
+            marcador.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubicacion, 18.5f));
 
-                Marker marcador = mMap.addMarker(new MarkerOptions().position(ubicacion));
-
-                marcador.setIcon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubicacion, 18.5f));
-                marcadorlisto=true;
-            }else {
-                marcador.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubicacion, 18.5f));
-            }
 
 
         }

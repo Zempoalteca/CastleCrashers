@@ -176,7 +176,7 @@ public class DBHelper extends SQLiteOpenHelper {
      * @return Un arreglo de objetos Animal, null en caso de que no haya ningún animal en la Base de Datos.
      */
     public ArrayList<Animal> getAllAnimales(){
-        ArrayList<Animal> listaAnimales = null;
+        ArrayList<Animal> listaAnimales = new ArrayList<>();
         Animal index;
         SQLiteDatabase db = this.getReadableDatabase();
         cursor = db.rawQuery("SELECT "+ID+","+NOMBRE+", "+IMAGEN+", "+NIVEL+", "+LATITUD+","+LONGITUD+" FROM "+TABLA_ANIMAL,null);
@@ -206,7 +206,7 @@ public class DBHelper extends SQLiteOpenHelper {
      * @return Arreglo de String, con los nombres de los Animales, null en caso de que no exista record.
      */
     public ArrayList<String> getRecord(int gano){
-        ArrayList<String> record = null;
+        ArrayList<String> record = new ArrayList<>();
         if (gano==0 || gano==1){
             SQLiteDatabase db = this.getReadableDatabase();
             cursor = db.rawQuery("" +

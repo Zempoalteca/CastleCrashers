@@ -14,9 +14,5 @@
         android:layout_height="match_parent"
 
         tools:context=".MapsActivity" />
-    <Button
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:id="@+id/entrar"
-        android:text="entrar"/>
+
 </RelativeLayout>
