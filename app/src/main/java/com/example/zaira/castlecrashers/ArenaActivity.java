@@ -1,13 +1,21 @@
 package com.example.zaira.castlecrashers;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +35,7 @@ public class ArenaActivity extends Activity {
     private DBHelper db;
     private Jugador jugador;
     private Animal oponente;
+    private Vibrator v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +44,6 @@ public class ArenaActivity extends Activity {
 
         //Se recibe el id del oponente a enfrentar (enviado por el intento)
         int id_animal = getIntent().getIntExtra("id_animal",0);
-        //Toast.makeText(this, "Valor entero recibido: "+id_animal, Toast.LENGTH_SHORT).show();
 
         //Se asocia los elementos visuales on la lógica
         imagenJugador = findViewById(R.id.iv_imagen_jugador);
@@ -45,6 +53,7 @@ public class ArenaActivity extends Activity {
         vidaJugador = findViewById(R.id.pb_vida_jugador);
         vidaOponente = findViewById(R.id.pb_vida_oponente);
         btn_pelea = findViewById(R.id.btn_iniciaBatalla);
+        v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
 
         //Se instancia la Base de Datos
@@ -71,8 +80,9 @@ public class ArenaActivity extends Activity {
         btn_pelea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ArenaActivity.this, "Inicia la simulación de la pelea!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ArenaActivity.this, "Inicia la pelea!", Toast.LENGTH_SHORT).show();
                 Batalla batalla = new Batalla();
+                btn_pelea.setEnabled(false);
                 batalla.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,null);
             }
         });
@@ -100,17 +110,19 @@ public class ArenaActivity extends Activity {
                     //Ataca primero el JUGADOR
                     Thread.sleep(1000);
                     vida_oponente -= (aleatorio.nextInt(10)+1);
+                    v.vibrate(50);
                     publishProgress(new Integer[]{vida_jugador,vida_oponente});
                     //Ataca en segundo el OPONENETE
                     Thread.sleep(1000);
                     vida_jugador -= (aleatorio.nextInt(10)+1);
+                    v.vibrate(75);
                     publishProgress(new Integer[]{vida_jugador,vida_oponente});
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             } while (vidaJugador.getProgress() > 0 && vidaOponente.getProgress() > 0);
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -121,67 +133,29 @@ public class ArenaActivity extends Activity {
         protected void onProgressUpdate(Integer... values) {
             vidaJugador.setProgress(values[0]);
             vidaOponente.setProgress(values[1]);
+            if (vidaJugador.getProgress() > 25 && vidaJugador.getProgress()<70)
+                vidaJugador.setProgressTintList(ColorStateList.valueOf(Color.YELLOW));
+            if (vidaOponente.getProgress()>25 && vidaOponente.getProgress()<70)
+                vidaOponente.setProgressTintList(ColorStateList.valueOf(Color.YELLOW));
+            if (vidaJugador.getProgress()<=25)
+                vidaJugador.setProgressTintList(ColorStateList.valueOf(Color.RED));
+            if (vidaOponente.getProgress() <= 25)
+                vidaOponente.setProgressTintList(ColorStateList.valueOf(Color.RED));
         }
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             //Guardar el resultado de la pelea en la base de datos
-            //finish();
             String vencedor;
             if (vidaJugador.getProgress() > 0){
                 vencedor = jugador.getNombre();
+                db.setResultadoPelea(jugador.getId_jugador(),oponente.getId_animal(),true);
             }else{
                 vencedor = oponente.getNombre();
+                db.setResultadoPelea(jugador.getId_jugador(),oponente.getId_animal(),false);
             }
             Toast.makeText(ArenaActivity.this, "El vencedor es: "+vencedor+"!!!", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
-
-
-
-
-    /*
-    *     public class Descargar extends AsyncTask<String, Integer, Bitmap>{
-
-        private ProgressBar barra;
-
-        @Override
-        protected void onPreExecute() {
-            barra = findViewById(R.id.progress_bar);
-            super.onPreExecute();
-            ImageView imagen = findViewById(R.id.imagen);
-            imagen.setImageBitmap(null);
-            barra.setMax(10000);
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            barra.setProgress(values[0]);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            ImageView imagen = findViewById(R.id.imagen);
-            imagen.setImageBitmap(bitmap);
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... strings) {
-            try{
-                URL imagenUrl = new URL(strings[0]);
-                Bitmap imagen = BitmapFactory.decodeStream(imagenUrl.openStream());
-                for (int i=0; i<10000; i++){
-                    publishProgress(i);
-                }
-                return imagen;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }*/
-
-
 }
